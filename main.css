@@ -1,0 +1,28 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.form-wrapper {
+    min-width: 230px;
+    padding: 32px 50px 24px;
+    background: #F8F8F7;
+}
+    .form-header {
+        font-size: 20px;
+        font-weight: normal;
+    }
+
+.button-wrapper {
+    padding: 0 50px 32px 50px;
+}
+    .button {
+        margin: 24px 16px 0 0;
+        padding: 8px 16px;
+        background: #4262FF;
+        border: 0 none;
+        border-radius: 6px;
+        color: #FFF;
+        cursor: pointer;
+    }

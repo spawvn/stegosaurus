@@ -1,0 +1,42 @@
+.emails-input {
+    font-family: 'Open Sans', sans-serif;
+    min-height: 70px;
+    max-height: 130px;
+    max-width: 700px;
+    overflow: auto;
+    color: #050038;
+    padding: 8px 7px;
+    background-color: #FFF;
+    border: 1px solid #C3C2CF;
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 24px;
+    cursor: default;
+}
+    .emails-input-block {
+        display: inline-block;
+        margin: 4px 5px;
+        padding: 0 10px;
+        background: rgba(102, 153, 255, 0.2);
+        border-radius: 100px;
+        cursor: default;
+    }
+    .emails-input-block.invalid {
+        padding: 0;
+        margin: 0 10px 0 2px;
+        border-radius: 0;
+        background-color: transparent;
+        border-bottom: 1px dashed #D92929;
+    }
+        .email-block-content {
+            cursor: default;
+        }
+        .email-block-delete {
+            font-size: 10px;
+            vertical-align: top;
+            display: inline-block;
+            height: 10px;
+            margin-left: 6px;
+            cursor: pointer;
+        }

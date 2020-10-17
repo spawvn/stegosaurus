@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel = "stylesheet" type = "text/css" href = "main.css" />
+    <link rel = "stylesheet" type = "text/css" href = "components/emails-input/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="form-wrapper">
+        <h1 class="form-header">Share <b>Board name</b> with others</h1>
+        <form>
+            <div id="emails-input"></div>
+        </form>
+    </div>
+    <div class="button-wrapper">
+        <button id="add-email" class="button">Add email</button>
+        <button id="count-emails" class="button">Get emails count</button>
+        <button id="get-emails" class="button">Get all</button>
+        <button id="replace-emails" class="button">Replace all</button>
+        <button id="empty-emails" class="button">Empty</button>
+    </div>
+
+    <script src="components/emails-input/index.js"></script>
+    <script>
+      var inputContainerNode = document.querySelector('#emails-input');
+      var emailsInput = new EmailsInput(inputContainerNode);
+
+      // Handling Add email and Get emails count buttons, etc.
+      var addEmailButton = document.querySelector('#add-email');
+      var getEmailsCountButton = document.querySelector('#count-emails');
+      var getEmailsButton = document.querySelector('#get-emails');
+      var replaceEmailsButton = document.querySelector('#replace-emails');
+      var emptyButton = document.querySelector('#empty-emails');
+
+      addEmailButton.addEventListener('click', function(){
+        var random = Math.random().toString(36).substr(2, Math.ceil(Math.random() * 10 + 3))
+        emailsInput.createBlocks([random + '@email.com']);
+      })
+      getEmailsCountButton.addEventListener('click', function(){
+        alert('Valid email count: ' + emailsInput.getEmailCount());
+      })
+      getEmailsButton.addEventListener('click', function(){
+        alert(emailsInput.getAllEmails().join(', '));
+      })
+      replaceEmailsButton.addEventListener('click', function(){
+        emailsInput.replaceAllEmails(['user1@email.com', 'user2@email.com', 'user3@email.com']);
+      })
+      emptyButton.addEventListener('click', function(){
+        emailsInput.replaceAllEmails([]);
+      })
+
+      // Custom events
+      inputContainerNode.addEventListener('block-add', function(e){
+        console.log('block-add Event: ', e.data);
+      })
+      inputContainerNode.addEventListener('block-remove', function(e){
+        console.log('block-remove Event: ', e.data);
+      })
+
+      // Testing
+      addEmailButton.click();
+      emailsInput.createBlocks(['invalid-email.com']);
+      addEmailButton.click();
+      addEmailButton.click();
+      addEmailButton.click();
+      addEmailButton.click();
+    </script>
+</body>
+</html>
