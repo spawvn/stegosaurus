@@ -1,4 +1,4 @@
-#Stegosaurus
+# Stegosaurus
 
 A simple component for multi-email input
 
@@ -35,7 +35,7 @@ inputContainerNode.addEventListener('block-remove', function(e){
   console.log('block-remove Event: ', e.data);
 })
 ```
-###Public API:
+### Public API:
 #### createBlocks
 Accepts:
 - `values` [Array of Strings, optional]  
