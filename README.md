@@ -57,3 +57,7 @@ Counts all valid email blocks.
 Returns: [Array of Strings]  
 
 Returns the values of all email blocks, both valid and invalid.
+
+#### destroy 
+
+Clen up event bindings. Invoked automatically upon root node deletion.

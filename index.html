@@ -34,38 +34,36 @@
       var replaceEmailsButton = document.querySelector('#replace-emails');
       var emptyButton = document.querySelector('#empty-emails');
 
-      addEmailButton.addEventListener('click', function(){
+      addEmailButton.addEventListener('click', addRandomEmail)
+      getEmailsCountButton.addEventListener('click', countValidEmails)
+      getEmailsButton.addEventListener('click', showAllEmails)
+      replaceEmailsButton.addEventListener('click', replaceEmails)
+      emptyButton.addEventListener('click', emptyAll)
+
+      function addRandomEmail() {
         var random = Math.random().toString(36).substr(2, Math.ceil(Math.random() * 10 + 3))
         emailsInput.createBlocks([random + '@email.com']);
-      })
-      getEmailsCountButton.addEventListener('click', function(){
+      }
+      function countValidEmails() {
         alert('Valid email count: ' + emailsInput.getEmailCount());
-      })
-      getEmailsButton.addEventListener('click', function(){
+      }
+      function showAllEmails() {
         alert(emailsInput.getAllEmails().join(', '));
-      })
-      replaceEmailsButton.addEventListener('click', function(){
+      }
+      function replaceEmails() {
         emailsInput.replaceAllEmails(['user1@email.com', 'user2@email.com', 'user3@email.com']);
-      })
-      emptyButton.addEventListener('click', function(){
+      }
+      function emptyAll() {
         emailsInput.replaceAllEmails([]);
-      })
+      }
 
       // Custom events
       inputContainerNode.addEventListener('block-add', function(e){
-        console.log('block-add Event: ', e.data);
+        console.log('"block-add" Event: ', e.data);
       })
       inputContainerNode.addEventListener('block-remove', function(e){
-        console.log('block-remove Event: ', e.data);
+        console.log('"block-remove" Event: ', e.data);
       })
-
-      // Testing
-      addEmailButton.click();
-      emailsInput.createBlocks(['invalid-email.com']);
-      addEmailButton.click();
-      addEmailButton.click();
-      addEmailButton.click();
-      addEmailButton.click();
     </script>
 </body>
 </html>

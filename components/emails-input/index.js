@@ -1,22 +1,37 @@
 var EmailsInput = (function () {
   // Constructor
   function EmailsInput(node) {
-    this.node = node;
+    this._node = node;
+    this._blocks = [];
+
     node.setAttribute('contenteditable', 'true');
     node.className = 'emails-input';
-    node.addEventListener('keydown', createBlockHandler.bind(this));
-    node.addEventListener('blur', createBlockHandler.bind(this));
-    node.addEventListener('click', deleteBlockHandler.bind(this));
-    node.addEventListener('paste', pasteHandler.bind(this));
-    node.addEventListener('DOMNodeRemoved', nodeRemovalHandler);
-    node.addEventListener('mscontrolselect', function (e) {
-      e.preventDefault();
-    });
+
+    // Event handlers
+    var _createBlockHandler = createBlockHandler.bind(this);
+    this._eventHandlers = [
+      {type: 'keydown', fn: _createBlockHandler},
+      {type: 'blur', fn: _createBlockHandler},
+      {type: 'paste', fn: pasteHandler.bind(this)},
+      {type: 'click', fn: deleteBlockHandler.bind(this)},
+      {type: 'DOMNodeRemoved', fn: nodeRemovalHandler.bind(this)},
+      {
+        type: 'mscontrolselect', fn: function (e) {
+          e.preventDefault();
+        }
+      },
+    ];
+
+    // Add events
+    for (var i = 0; i < this._eventHandlers.length; i++) {
+      var mapping = this._eventHandlers[i];
+      node.addEventListener(mapping.type, mapping.fn);
+    }
   }
 
   // Private methods
 
-  var createBlockHandler = function (e) {
+  function createBlockHandler(e) {
     // Lose focus, press "," "enter" or "space"
     if (e.type === 'blur' || e.keyCode === 188 || e.keyCode === 13 || e.keyCode === 32) {
       e.preventDefault();
@@ -27,7 +42,7 @@ var EmailsInput = (function () {
     }
   }
 
-  var pasteHandler = function (e) {
+  function pasteHandler(e) {
     // Get pasted data
     var data = e.clipboardData.getData('text/plain');
 
@@ -40,7 +55,7 @@ var EmailsInput = (function () {
     e.preventDefault();
   }
 
-  var deleteBlockHandler = function (e) {
+  function deleteBlockHandler(e) {
     e.preventDefault();
     var node = e.target || e.srcElement;
     if (node.className === 'email-block-delete') {
@@ -51,9 +66,12 @@ var EmailsInput = (function () {
     }
   }
 
-  var nodeRemovalHandler = function (e) {
+  function nodeRemovalHandler(e) {
     var node = e.target || e.srcElement;
-    if(node.nodeType === 1) {
+    if (node === this._node) {
+      this.destroy();
+    } else if (node.nodeType === 1) {
+      this._blocks.splice(this._blocks.indexOf(node), 1);
       var event = document.createEvent('Event');
       event.initEvent('block-remove', true, true);
       event.data = {email: node.querySelector('.email-block-content').textContent};
@@ -61,7 +79,7 @@ var EmailsInput = (function () {
     }
   }
 
-  var generateBlock = function (value) {
+  function generateBlock(value) {
     // Create container
     var block = document.createElement('div');
     block.className = 'emails-input-block';
@@ -81,15 +99,16 @@ var EmailsInput = (function () {
     del.innerHTML = '&#10006;';
     block.appendChild(del);
 
+    this._blocks.push(block);
     return block;
   }
 
-  var validateEmail = function (email) {
+  function validateEmail(email) {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
   }
 
-  var resetCaret = function (node) {
+  function resetCaret(node) {
     node.focus();
     if (typeof window.getSelection != "undefined"
       && typeof document.createRange != "undefined") {
@@ -116,44 +135,53 @@ var EmailsInput = (function () {
     // If values are provided, user input is not processed
     if (Array.isArray(values) && values.length) {
       for (var i = 0; i < values.length; i++) {
-        this.node.appendChild(generateBlock.call(this, values[i]));
+        this._node.appendChild(generateBlock.call(this, values[i]));
         event.data = {email: values[i], method: 'arguments'};
-        this.node.dispatchEvent(event);
+        this._node.dispatchEvent(event);
       }
     }
     // Otherwise, all text nodes get converted into blocks
     else {
-      var textNodeList = this.node.childNodes;
+      var textNodeList = this._node.childNodes;
       var textNodes = Array.prototype.slice.call(textNodeList).filter(function (el) {
         return el.nodeType === 3;
       });
       for (var j = 0; j < textNodes.length; j++) {
         var value = textNodes[j].textContent;
-        this.node.replaceChild(generateBlock.call(this, value), textNodes[j]);
+        this._node.replaceChild(generateBlock.call(this, value), textNodes[j]);
         event.data = {email: value, method: 'user input'};
-        this.node.dispatchEvent(event);
+        this._node.dispatchEvent(event);
       }
     }
   }
 
   EmailsInput.prototype.replaceAllEmails = function (values) {
-    var nodeList = this.node.querySelectorAll('.emails-input-block');
-    for (var i = 0; i < nodeList.length; i++) {
-      this.node.removeChild(nodeList[i]);
+    var count = this._blocks.length;
+    for (var i = 0; i < count; i++) {
+      this._node.removeChild(this._blocks[0]);
     }
     this.createBlocks(values);
   }
 
   EmailsInput.prototype.getEmailCount = function () {
-    return this.node.querySelectorAll('.emails-input-block:not(.invalid)').length;
+    return this._blocks.filter(
+      function (el) {
+        return el.className.indexOf('invalid') < 0;
+      }).length;
   }
 
   EmailsInput.prototype.getAllEmails = function () {
-    var nodeList = this.node.querySelectorAll('.emails-input-block');
-    return Array.prototype.slice.call(nodeList).map(
+    return this._blocks.map(
       function (el) {
         return el.querySelector('.email-block-content').textContent
       })
+  }
+
+  EmailsInput.prototype.destroy = function () {
+    for (var i = 0; i < this._eventHandlers.length; i++) {
+      var mapping = this._eventHandlers[i];
+      this._node.removeEventListener(mapping.type, mapping.fn);
+    }
   }
 
   return EmailsInput;
